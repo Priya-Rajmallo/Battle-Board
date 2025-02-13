@@ -112,6 +112,16 @@ Route::group(['middleware' => 'auth'], function () {
     })->name('GST');
 
 
+    Route::get('/withdrawal', function () {
+        $users = User::where(function ($query) {
+            $query->where('user_type', 'user')
+                ->orWhere('user_type', 'promoter');
+        })->where('status', '1')->orderBy('name', 'asc')->get();
+
+        return view('admin.withdrawal', compact('users'));
+    })->name('Withdrawal');
+
+
     Route::get('/payment-approval', function () {
         return view('admin.payment_approval');
     })->name('paymentsApproval');
@@ -187,7 +197,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/admins-dataTable', [DataTableController::class, 'adminsDataTable'])->name('admins.DataTable');
     Route::get('/promoters-dataTable', [DataTableController::class, 'promotersDataTable'])->name('promoters.DataTable');
     Route::get('/tds-dataTable', [DataTableController::class, 'tdsDataTable'])->name('tds.DataTable');
-    
+    Route::get('/gst-dataTable', [DataTableController::class, 'gstDataTable'])->name('gst.DataTable');
+    Route::get('/withdrawal-dataTable', [DataTableController::class, 'withdrawalDataTable'])->name('withdrawal.DataTable');
     Route::get('/promotersApproval-dataTable', [DataTableController::class, 'promotersApprovalDataTable'])->name('promotersApproval.DataTable');
     Route::get('/paymentApproval-dataTable', [DataTableController::class, 'paymentApprovalDataTable'])->name('paymentApproval.DataTable');
     Route::get('/withdrawalsApproval-dataTable', [DataTableController::class, 'withdrawalsApprovalDataTable'])->name('withdrawalsApproval.DataTable');
@@ -212,7 +223,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/transaction-dataTable/{userId}', [DataTableController::class, 'transactionDataTable'])->name('transactions.DataTable');
     Route::get('/gst-transaction-dataTable/{userId}', [DataTableController::class, 'GSTTransactionDataTable'])->name('gst.transactions.DataTable');
     Route::get('/tds-transaction-dataTable/{userId}', [DataTableController::class, 'TDSTransactionDataTable'])->name('tds.transactions.DataTable');
-    Route::get('/gst-dataTable', [DataTableController::class, 'gstDataTable'])->name('gst.DataTable');
+
     Route::post('/promoter-status/toggle', [PromoterStatusController::class, 'toggleStatus'])->name('promoter_status.toggle');
     Route::post('/promoter-downgrade', [PromoterController::class, 'promoterDowngrade'])->name('promoter.downgrade');
     Route::post('/promoter-upgrade', [PromoterController::class, 'promoterUpgrade'])->name('promoter.upgrade');

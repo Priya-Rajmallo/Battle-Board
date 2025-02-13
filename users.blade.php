@@ -237,7 +237,8 @@
                     // Replace ':userId' in the profile route with the actual user ID
                     var route = profileRoute.replace(':userId', data);
 
-                     return '<a href="' + route + '" class="text-primary">' + data + '</a>';
+                     //return '<a href="' + route + '" class="text-primary">' + data + '</a>';
+                     return '<a href="' + route + '" class="text-primary" target="_blank" rel="noopener noreferrer">' + data + '</a>';
                      }
                     },
 

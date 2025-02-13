@@ -24,7 +24,7 @@
         <nav class="page-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Deposit</li>
+                <li class="breadcrumb-item active" aria-current="page">Withdrawal</li>
             </ol>
         </nav>
 
@@ -35,7 +35,7 @@
             <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-header">
-                        <h6 class="card-title">Deposit List</h6>
+                        <h6 class="card-title">Withdrawal List</h6>
                     </div>
                     <div class="card-body">
                         <form id="searchForm">
@@ -119,7 +119,7 @@
             var dataTable = $('#dataTable').DataTable();
 
             // Update the DataTable's ajax URL with the new parameters
-            dataTable.ajax.url('{{ route('gst.DataTable') }}?start_date=' +
+            dataTable.ajax.url('{{ route('withdrawal.DataTable') }}?start_date=' +
                 startDate + '&end_date=' +
                 endDate).load();
             // }
@@ -127,14 +127,14 @@
 
 
         $(document).ready(function() {
-            $('.gst').addClass('active');
+            $('.withdrawal').addClass('active');
             $('#userId').prop('disabled', false);
 
             dataTable = $('#dataTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('gst.DataTable') }}',
+                    url: '{{ route('withdrawal.DataTable') }}',
                 },
                 columns: [{
                         title: 'SN', // Title for the serial number column
@@ -146,8 +146,8 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     }, {
-                        data: 'transaction.transaction_date',
-                        name: 'transaction.transaction_date',
+                        data: 'date',
+                        name: 'date',
                         title: 'date',
                         width: 50,
                         render: function(data, type, row, meta) {
@@ -177,74 +177,36 @@
                     
                     
                     {
-                        data: 'transaction.transaction_id',
-                        name: 'transaction.transaction_id',
-                        title: 'Transaction ID',
+                        data: 'wallet_section',
+                        name: 'wallet_section',
+                        title: 'Wallet',
                         width: 50,
                         render: function(data, type, row, meta) {
                             return data == "" ? 'N/A' : data;
 
                         }
                     }, {
-                        data: 'transaction.transaction_type',
-                        name: 'transaction.transaction_type',
-                        title: 'Type',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-
-                        }
-                    }, {
-                        data: 'transaction.transaction_details',
-                        name: 'transaction.transaction_details',
-                        title: 'Details',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-                        }
-                    }, {
-                        data: 'transaction.transaction_coin',
-                        name: 'transaction.transaction_coin',
-                        title: 'Coin',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-
-                        }
-                    },
-                    {
-                        data: 'total_amount',
-                        name: 'total_amount',
-                        title: 'Total',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-
-                        }
-                    },
-                    {
-                        data: 'gst_amount',
-                        name: 'gst_amount',
-                        title: 'GST',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-
-                        }
-                    },
-                    {
-                        data: 'transaction.transaction_amount',
-                        name: 'transaction.transaction_amount',
+                        data: 'inr',
+                        name: 'inr',
                         title: 'INR',
                         width: 50,
                         render: function(data, type, row, meta) {
                             return data == "" ? 'N/A' : data;
 
                         }
-                    },
+                    }, {
+                        data: 'coin',
+                        name: 'coin',
+                        title: 'Coin',
+                        width: 50,
+                        render: function(data, type, row, meta) {
+                            return data == "" ? 'N/A' : data;
+                        }
+                    }, 
+                 
                     {
-                        data: 'transaction.transaction_status',
-                        name: 'transaction.transaction_status',
+                        data: 'withdrawal_status',
+                        name: 'withdrawal_status',
                         title: 'Status',
                         width: 25,
                         render: function(data, type, row, meta) {
@@ -256,44 +218,18 @@
                                 return '<span class="badge bg-secondary">Unknown</span>';
                             }
                         }
-                    },
-                    {
-                        data: null,
-                        name: 'transaction.transaction.id',
-                        title: 'Action',
-                        width: 25,
-                        render: function(data, type, row, meta) {
-
-                            var viewBtn =
-                                '<a class="btn btn-primary btn-xs view-btn" href="#" data-route="{{ route('gst.invoice', ['transactionId' => ':data']) }}">View</a>';
-                            viewBtn = viewBtn.replace(':data', data.transaction_id);
-
-
-                            // var viewBtn =
-                            //     '<button class="btn btn-primary btn-xs view-btn" data-transaction_id="' +
-                            //     data
-                            //     .transaction_id + '" data-data=\'' +
-                            //     JSON.stringify(data) + '\'>View</button>';
-
-                            var deleteBtn =
-                                '<button class="btn btn-danger btn-xs delete-btn" data-data=\'' +
-                                JSON.stringify(data) + '\'>Delete</button>';
-
-
-                            return viewBtn + ' ' + deleteBtn;
-
-                        }
                     }
+               
 
                 ],
                 order: [
                     [0, 'desc'] // '0' refers to the first column, 'desc' means descending order
                 ],
-
                 dom: 'Blfrtip', // Include the Buttons extension controls
                 buttons: [
                     'excel', 'pdf',
                 ],
+              
             });
 
        

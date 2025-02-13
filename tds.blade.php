@@ -24,18 +24,80 @@
         <nav class="page-breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('index') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Deposit</li>
+                <li class="breadcrumb-item active" aria-current="page">TDS</li>
             </ol>
         </nav>
 
         <div class="row">
-          
+            <div class="col-md-4">
+                <form id="tdsUploadForm">
+                    @csrf
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title">TDS Upload</h6>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="row mb-3">
+                                <div id="panNoAlert" class="alert alert-danger" role="alert" style="display: none;">
+                                    PAN Number required.
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="userId" class="col-sm-3 col-form-label">Username</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="userId" name="userId" disabled>
+                                        <option value="" selected disabled>-- Select --</option>
+                                        @foreach ($users as $row)
+                                            <option value="{{ $row->str_user_id }}"
+                                                data-user_data="{{ json_encode($row) }}">
+                                                {{ $row->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="panNo" class="col-sm-3 col-form-label">PAN No</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="panNo" name="panNo"
+                                        autocomplete="off" maxlength="10" placeholder="Pan Number" disabled>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="tdsDate" class="col-sm-3 col-form-label">Date</label>
+                                <div class="col-sm-9">
+                                    <input type="date" class="form-control" id="tdsDate" name="tdsDate"
+                                        autocomplete="off" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="tdsFile" class="col-sm-3 col-form-label">TDS File</label>
+                                <div class="col-sm-9">
+                                    <input type="file" class="form-control" id="tdsFile" name="tdsFile" accept=".pdf"
+                                        required>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" id="uploadBtn" class="btn btn-primary me-2 tds-btn"
+                                disabled>Upload</button>
+                            <button class="btn btn-secondary tds-btn" disabled>Reset</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
 
 
-            <div class="col-md-12 grid-margin stretch-card">
+            <div class="col-md-8 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-header">
-                        <h6 class="card-title">Deposit List</h6>
+                        <h6 class="card-title">TDS List</h6>
                     </div>
                     <div class="card-body">
                         <form id="searchForm">
@@ -58,7 +120,6 @@
                                     <div class="mb-3">
                                         <button type="button" class="btn btn-primary" id="searchBtn"
                                             onclick="searchData();">Search</button>
-                                            
                                     </div>
                                 </div>
                             </div>
@@ -119,7 +180,7 @@
             var dataTable = $('#dataTable').DataTable();
 
             // Update the DataTable's ajax URL with the new parameters
-            dataTable.ajax.url('{{ route('gst.DataTable') }}?start_date=' +
+            dataTable.ajax.url('{{ route('tds.DataTable') }}?start_date=' +
                 startDate + '&end_date=' +
                 endDate).load();
             // }
@@ -127,14 +188,14 @@
 
 
         $(document).ready(function() {
-            $('.gst').addClass('active');
+            $('.tds').addClass('active');
             $('#userId').prop('disabled', false);
 
             dataTable = $('#dataTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('gst.DataTable') }}',
+                    url: '{{ route('tds.DataTable') }}',
                 },
                 columns: [{
                         title: 'SN', // Title for the serial number column
@@ -146,9 +207,9 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     }, {
-                        data: 'transaction.transaction_date',
-                        name: 'transaction.transaction_date',
-                        title: 'date',
+                        data: 'date',
+                        name: 'date',
+                        title: 'Date',
                         width: 50,
                         render: function(data, type, row, meta) {
                             // Convert the date to d-m-y format
@@ -156,8 +217,8 @@
                             return formattedDate;
                         }
                     }, 
-
-                        
+                    
+                    
                     {
                     data: 'user_id',
                     name: 'user_id',
@@ -174,193 +235,43 @@
                      }
                     },
                     
-                    
-                    
                     {
-                        data: 'transaction.transaction_id',
-                        name: 'transaction.transaction_id',
-                        title: 'Transaction ID',
+                        data: null,
+                        name: 'name',
+                        title: 'Name',
                         width: 50,
                         render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
+                            return data.user.name == "" ? 'N/A' : data.user.name;
 
-                        }
-                    }, {
-                        data: 'transaction.transaction_type',
-                        name: 'transaction.transaction_type',
-                        title: 'Type',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-
-                        }
-                    }, {
-                        data: 'transaction.transaction_details',
-                        name: 'transaction.transaction_details',
-                        title: 'Details',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-                        }
-                    }, {
-                        data: 'transaction.transaction_coin',
-                        name: 'transaction.transaction_coin',
-                        title: 'Coin',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-
-                        }
-                    },
-                    {
-                        data: 'total_amount',
-                        name: 'total_amount',
-                        title: 'Total',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-
-                        }
-                    },
-                    {
-                        data: 'gst_amount',
-                        name: 'gst_amount',
-                        title: 'GST',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-
-                        }
-                    },
-                    {
-                        data: 'transaction.transaction_amount',
-                        name: 'transaction.transaction_amount',
-                        title: 'INR',
-                        width: 50,
-                        render: function(data, type, row, meta) {
-                            return data == "" ? 'N/A' : data;
-
-                        }
-                    },
-                    {
-                        data: 'transaction.transaction_status',
-                        name: 'transaction.transaction_status',
-                        title: 'Status',
-                        width: 25,
-                        render: function(data, type, row, meta) {
-                            if (data == 0) {
-                                return '<span class="badge bg-danger">Error</span>';
-                            } else if (data == 1) {
-                                return '<span class="badge bg-success">Success</span>';
-                            } else {
-                                return '<span class="badge bg-secondary">Unknown</span>';
-                            }
                         }
                     },
                     {
                         data: null,
-                        name: 'transaction.transaction.id',
+                        name: 'id',
                         title: 'Action',
                         width: 25,
                         render: function(data, type, row, meta) {
-
-                            var viewBtn =
-                                '<a class="btn btn-primary btn-xs view-btn" href="#" data-route="{{ route('gst.invoice', ['transactionId' => ':data']) }}">View</a>';
-                            viewBtn = viewBtn.replace(':data', data.transaction_id);
-
-
-                            // var viewBtn =
-                            //     '<button class="btn btn-primary btn-xs view-btn" data-transaction_id="' +
-                            //     data
-                            //     .transaction_id + '" data-data=\'' +
-                            //     JSON.stringify(data) + '\'>View</button>';
-
-                            var deleteBtn =
-                                '<button class="btn btn-danger btn-xs delete-btn" data-data=\'' +
-                                JSON.stringify(data) + '\'>Delete</button>';
-
-
-                            return viewBtn + ' ' + deleteBtn;
-
+                            var pdfLink = '/public/pdf/tds/' + data.tds_file;
+                            var viewLink = '<a class="btn btn-success btn-xs view-user" href="' +
+                                pdfLink + '" target="_blank">View</a>';
+                            return viewLink;
                         }
                     }
 
                 ],
                 order: [
-                    [0, 'desc'] // '0' refers to the first column, 'desc' means descending order
+                    [1, 'desc'] // '0' refers to the first column, 'desc' means descending order
                 ],
-
                 dom: 'Blfrtip', // Include the Buttons extension controls
                 buttons: [
                     'excel', 'pdf',
                 ],
             });
 
-       
-
             $('table').on('click', '.view-btn', function(e) {
                 e.preventDefault();
                 var route = $(this).data('route');
-                // window.location.href = route;
-                window.open(route, '_blank'); // Open in a new tab/window
-
-            });
-
-
-            $('table').on('click', '.delete-btn', function(e) {
-                e.preventDefault();
-
-                // Show confirmation dialog
-                const isConfirmed = confirm('Are you sure you want to delete this?');
-
-                if (!isConfirmed) {
-                    return; // Exit if the user does not confirm
-                }
-
-                const data = $(this).data('data');
-                console.log(data);
-                const transactionId = data.transaction_id;
-
-                $('.delete-btn').prop('disabled', true);
-
-                $.ajax({
-                    url: "{{ route('admin.delete.transaction') }}", //backend url
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        transactionId: transactionId,
-                    },
-                    type: "post",
-                    async: true, //hold the next execution until the previous execution complete
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log(response); //error occurs
-                        Swal.fire({
-                            title: response.message,
-                            // text: '',
-                            icon: "success",
-                            allowOutsideClick: false
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                dataTable.ajax.reload();
-                            }
-                        });
-                    },
-                    error: function(response) {
-                        $('#submitButton').prop('disabled', false);
-                        console.log(response); //error occurs
-                        // console.log(response.responseJSON.errors); //error occurs
-                        Swal.fire({
-                            title: response.responseJSON.errors,
-                            // text: '',
-                            icon: "danger",
-                            allowOutsideClick: false
-                        });
-                    },
-                    always: function(response) {
-                        $('.delete-btn').prop('disabled', false);
-                    }
-                });
-
+                window.location.href = route;
             });
 
             $(document).on('submit', '#tdsUploadForm', function(event) {

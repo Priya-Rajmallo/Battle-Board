@@ -14,6 +14,7 @@ use App\Models\Tournament;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\WithdrawalRequest;
+use App\Models\WithdrawalLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -108,6 +109,27 @@ class DataTableController extends Controller
     }
 
 
+    function withdrawalDataTable(Request $request)
+    {
+
+        if ($request->input('start_date')) {
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+
+            $data = WithdrawalLog::join('users', 'withdrawal_logs.user_id', '=', 'users.str_user_id')
+                ->whereBetween('date', [$startDate, $endDate])
+                ->select('withdrawal_logs.*', 'users.name')
+                ->get();
+
+            return DataTables::of($data)->make(true);
+        } else {
+            $data = WithdrawalLog::join('users', 'withdrawal_logs.user_id', '=', 'users.str_user_id')
+                ->select('withdrawal_logs.*', 'users.name')
+                ->get();
+
+            return DataTables::of($data)->make(true);
+        }
+    }
    
 
 
@@ -284,6 +306,8 @@ class DataTableController extends Controller
             return DataTables::of($data)->make(true);
         }
     }
+
+
 
 
     function promotersApprovalDataTable(Request $request)

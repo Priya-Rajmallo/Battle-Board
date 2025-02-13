@@ -22,8 +22,8 @@
 
         <nav class="page-breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('admin.Dashboard') }}">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Feedback</li>
+                <li class="breadcrumb-item"><a href="{{ route('promoters') }}">Users</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Promoter</li>
             </ol>
         </nav>
 
@@ -31,7 +31,7 @@
             <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-header">
-                        <h6 class="card-title">Feedback</h6>
+                        <h6 class="card-title">Promoter List</h6>
                     </div>
                     <div class="card-body">
                         <form id="searchForm">
@@ -72,6 +72,77 @@
             </div>
         </div>
 
+
+        <!-- Modal -->
+        <div class="modal fade" id="bankModel" tabindex="-1" aria-labelledby="bankModelLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bankModelLabel">Bank Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="btn-close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row text-center" id="BankDetailsNotAvailable" style="display: none;">
+                            <h3>
+                                Bank details not available.
+                            </h3>
+                        </div>
+                        <div class="row p-4" id="BankDetailsAvailable" style="display: none;">
+
+                            <h4 class="text-center mb-2"><span id="bankName"></span></h4>
+                            <table class="align-items-center">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <i class="mdi mdi-account"></i>
+                                        </td>
+                                        <td>
+                                            <p> Account Holder:
+                                                <strong><span id="AccountHolder"></span></strong>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <i class="mdi mdi-bank"></i>
+                                        </td>
+                                        <td>
+                                            <p> Account Number:
+                                                <strong><span id="AccountNumber"></span></strong>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <i class="mdi mdi-barcode"></i>
+                                        </td>
+                                        <td>
+                                            <p> IFSC Code: <strong><span id="IFSC"></span></strong></p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <i class="mdi mdi-radiobox-marked"></i>
+                                        </td>
+                                        <td>
+                                            <p> Status:
+                                                <strong><span id="bankStatus"></span></strong>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        {{-- <button type="button" class="btn btn-primary">Save changes</button> --}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </section>
 @endsection
 
@@ -106,7 +177,7 @@
             var dataTable = $('#dataTable').DataTable();
 
             // Update the DataTable's ajax URL with the new parameters
-            dataTable.ajax.url('{{ route('feedback.DataTable') }}?start_date=' +
+            dataTable.ajax.url('{{ route('promoters.DataTable') }}?start_date=' +
                 startDate + '&end_date=' +
                 endDate).load();
             // }
@@ -114,16 +185,13 @@
 
 
         $(document).ready(function() {
-
-            $('.feedback').addClass('active');
-            $('.game-feedback').removeClass('active');
-
+            $('.promoters').addClass('active');
 
             dataTable = $('#dataTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('feedback.DataTable') }}',
+                    url: '{{ route('promoters.DataTable') }}',
                 },
                 columns: [{
                         title: 'SN', // Title for the serial number column
@@ -137,16 +205,14 @@
                     }, {
                         data: 'created_at',
                         name: 'created_at',
-                        title: 'created_at',
+                        title: 'date',
                         width: 50,
                         render: function(data, type, row, meta) {
                             // Convert the date to d-m-y format
-                            // console.log(data);
                             const formattedDate = moment(data).format('DD-MM-YYYY');
-
                             return formattedDate;
                         }
-                    },     
+                    }, 
                     
                     {
                     data: 'str_user_id',
@@ -164,29 +230,91 @@
                      }
                     },
                     
-                    
-                    
-                    
-                    
                     {
-                        data: 'user.name',
-                        name: 'user.name',
-                        title: 'User Name',
+                        data: 'name',
+                        name: 'name',
+                        title: 'Name',
                         width: 50,
                         render: function(data, type, row, meta) {
                             return data ?? 'N/A';
 
                         }
                     }, {
-                        data: 'message',
-                        name: 'message',
-                        title: 'message',
-                        width: 100,
+                        data: 'phone',
+                        name: 'phone',
+                        title: 'Phone',
+                        width: 50,
+                        render: function(data, type, row, meta) {
+                            return data ?? 'N/A';
+
+                        }
+                    }, {
+                        data: 'email',
+                        name: 'email',
+                        title: 'Email',
+                        width: 50,
+                        render: function(data, type, row, meta) {
+                            return data ?? 'N/A';
+
+                        }
+                    }, {
+                        data: 'address',
+                        name: 'address',
+                        title: 'Address',
+                        width: 50,
+                        render: function(data, type, row, meta) {
+                            return data ?? 'N/A';
+
+                        }
+                    }, {
+                        data: 'country',
+                        name: 'country',
+                        title: 'Country',
+                        width: 50,
                         render: function(data, type, row, meta) {
                             return data ?? 'N/A';
 
                         }
                     },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        title: 'Status',
+                        width: 25,
+                        render: function(data, type, row, meta) {
+                            if (data == 0) {
+                                return '<span class="badge bg-danger">Inactive</span>';
+                            } else if (data == 1) {
+                                return '<span class="badge bg-success">Active</span>';
+                            } else {
+                                return '<span class="badge bg-secondary">Unknown</span>';
+                            }
+                        }
+                    },
+                    {
+                        data: null,
+                        name: 'id',
+                        title: 'Action',
+                        width: 25,
+                        render: function(data, type, row, meta) {
+
+                            var viewLink =
+                                '<a class="btn btn-primary btn-xs view-user" href="#" data-route="{{ route('profile', ['userId' => ':data']) }}">View</a>';
+                            viewLink = viewLink.replace(':data', data.str_user_id);
+
+                            // var bankModel =
+                            //     '<button class="btn btn-primary btn-xs bank-details" data-data=\'' +
+                            //     JSON.stringify(data) + '\'>Bank Details</button>';
+
+                            var changeRole =
+                                '<button class="btn btn-danger btn-xs downgrade-btn" data-data=\'' +
+                                JSON.stringify(data) + '\'>Downgrade</button>';
+
+
+                            return viewLink + ' ' + changeRole;
+
+                        }
+                    }
 
                 ],
                 order: [
@@ -231,9 +359,45 @@
                 }
 
             });
+
+            $('table').on('click', '.downgrade-btn', function(e) {
+                e.preventDefault();
+                const data = $(this).data('data');
+
+                $('.downgrade-btn').prop('disabled', true);
+
+                if (confirm('Are you sure you want to downgrade this promoter to normal user?')) {
+                    console.log(data);
+                    $.ajax({
+                        url: '{{ route('promoter.downgrade') }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            status: 1,
+                            userData: data
+                        },
+                        success: function(response) {
+                            console.log(response);
+                            alert(response.message ?? 'N/A');
+                            $('.downgrade-btn').prop('disabled', false);
+                            dataTable.ajax.reload();
+                        },
+                        error: function(error) {
+                            console.log(error);
+                            $('.downgrade-btn').prop('disabled', false);
+                        }
+                    });
+                } else {
+                    // Action was cancelled by the user
+                    console.log('Action was cancelled');
+                    $('.downgrade-btn').prop('disabled', false);
+                }
+            });
+
         });
     </script>
-    <script>
+
+<script>
     var profileRoute = "{{ route('profile', ['userId' => ':userId']) }}";
 </script>
 @endsection

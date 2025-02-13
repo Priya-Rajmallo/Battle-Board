@@ -106,7 +106,7 @@
             var dataTable = $('#dataTable').DataTable();
 
             // Update the DataTable's ajax URL with the new parameters
-            dataTable.ajax.url('{{ route('feedback.DataTable') }}?start_date=' +
+            dataTable.ajax.url('{{ route('game.feedback.DataTable') }}?start_date=' +
                 startDate + '&end_date=' +
                 endDate).load();
             // }
@@ -115,15 +115,14 @@
 
         $(document).ready(function() {
 
-            $('.feedback').addClass('active');
-            $('.game-feedback').removeClass('active');
+            $('.game-feedback').addClass('active');
 
 
             dataTable = $('#dataTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{ route('feedback.DataTable') }}',
+                    url: '{{ route('game.feedback.DataTable') }}',
                 },
                 columns: [{
                         title: 'SN', // Title for the serial number column
@@ -146,11 +145,9 @@
 
                             return formattedDate;
                         }
-                    },     
-                    
-                    {
-                    data: 'str_user_id',
-                    name: 'str_user_id',
+                    },  {
+                    data: 'user_id',
+                    name: 'user_id',
                     title: 'User ID',
                     width: 50,
                     render: function(data, type, row, meta) {
@@ -163,9 +160,6 @@
                      return '<a href="' + route + '" class="text-primary" target="_blank" rel="noopener noreferrer">' + data + '</a>';
                      }
                     },
-                    
-                    
-                    
                     
                     
                     {
@@ -187,6 +181,26 @@
 
                         }
                     },
+                    {
+                        data: null,
+                        name: 'id',
+                        title: 'Action',
+                        width: 25,
+                        render: function(data, type, row, meta) {
+
+                            var viewLink =
+                                '<a class="btn btn-primary btn-xs view-user" href="#" data-route="{{ route('admin.game.feedback.view', ['feedbackId' => ':data']) }}">View</a>';
+                            viewLink = viewLink.replace(':data', data.id);
+
+                            // var bankModel =
+                            //     '<button class="btn btn-primary btn-xs bank-details" data-data=\'' +
+                            //     JSON.stringify(data) + '\'>Bank Details</button>';
+
+
+                            return viewLink;
+
+                        }
+                    }
 
                 ],
                 order: [
@@ -233,7 +247,8 @@
             });
         });
     </script>
-    <script>
+
+<script>
     var profileRoute = "{{ route('profile', ['userId' => ':userId']) }}";
 </script>
 @endsection
